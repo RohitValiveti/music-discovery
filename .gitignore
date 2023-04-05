@@ -3,3 +3,5 @@ venv/
 .venv/
 .cache
 *.csv
+__pycache__/
+.vscode/
