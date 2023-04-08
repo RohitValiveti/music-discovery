@@ -21,7 +21,7 @@ class SpotifyRecommender:
     def __init__(self):
         load_dotenv()
         self.sp = spotipy.Spotify(
-            auth_manager=SpotifyOAuth(scope="user-library-read"))
+            auth_manager=SpotifyOAuth(scope="playlist-modify-public"))
 
     def __create_feature_vectors(self, track_dataset_df):
         """
@@ -193,4 +193,21 @@ class SpotifyRecommender:
         Adds track with id track_id to user's playlist with
         id playlist_id.
         """
-        pass
+        track = self.sp.track(track_id)
+        uri = [track["uri"]]
+        self.sp.playlist_add_items(playlist_id, items=uri)
+
+    def profile_info(self):
+        """
+        Returns profile statistics about the current user.
+        Info returned: display name, followers, number of public playlists.
+        """
+        response = self.sp.current_user()
+
+        profile = {}
+        profile['followers'] = response['followers']['total']
+        profile['name'] = response['display_name']
+        playlists = self.playlists()
+        profile['public playlists'] = len(playlists)
+
+        return profile
