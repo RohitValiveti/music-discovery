@@ -2,9 +2,6 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 import pandas as pd
-import datetime
-import pytz
-from dateutil.relativedelta import relativedelta
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
 import warnings
@@ -26,181 +23,157 @@ class SpotifyRecommender:
         self.sp = spotipy.Spotify(
             auth_manager=SpotifyOAuth(scope="user-library-read"))
 
-    def __create_feature_vectores(self, all_tracks_df):
+    def __create_feature_vectors(self, track_dataset_df):
         """
-        Creates feature vector for each song in all_tracks_df.
-
+        Creates Feature Vectors for each track in the dataset. 
+        Tunable Parameters: Weight of each indicator variable (Genre, key, time_sig, popularity)
         Parameters:
         - all_tracks_df: consists of all tracks in the used dataset, mimicking the "spotify db"
         Returns:
         - dataframe consisting of each track id, and their feature vector normalized.
         """
+        # Get Unique Genre Values in df; make col for each genre and its corresponding value 1
+        genre_df = pd.get_dummies(track_dataset_df['genre']) * 1
 
-        # seperate feature columns and id column
-        features_only_df = all_tracks_df.drop(
-            ['name', 'album', 'artists', 'artist_ids', 'id'], axis=1).reset_index(drop=True)
-        id_df = all_tracks_df[['id']]
+        # Get Unique key Values in df; make col for each key and its corresponding value 1
+        key_df = pd.get_dummies(track_dataset_df['key']) * 1
 
+        # Create 5 point buckets for popularity feature (OHE) - Reduces sensitivity to feature
+        track_dataset_df['popularity_red'] = track_dataset_df['popularity'].apply(
+            lambda x: int(x/5))
+        tf_df = pd.get_dummies(track_dataset_df['popularity_red'])
+        feature_names = tf_df.columns
+        tf_df.columns = ["pop" + "|" + str(i) for i in feature_names]
+        tf_df.reset_index(drop=True, inplace=True)
+        popularity_cols_df = tf_df * 0.25
+
+        # Scale and Normalize remaining columns
+        float_cols = track_dataset_df[['acousticness', 'danceability', 'duration_ms', 'energy',
+                                       'instrumentalness', 'liveness', 'loudness', 'speechiness', 'tempo', 'valence']].reset_index(drop=True)
         scaler = MinMaxScaler()
-        features_scaled = pd.DataFrame(scaler.fit_transform(
-            features_only_df), columns=features_only_df.columns) * 0.2
+        floats_scaled = pd.DataFrame(scaler.fit_transform(
+            float_cols), columns=float_cols.columns) * 0.2
 
-        final_df = pd.concat([id_df, features_scaled], axis=1)
-        return final_df
+        # Create OHE Buckets for time_signature feature
+        time_sig_df = pd.get_dummies(track_dataset_df['time_signature']) * 0.2
 
-    def __tracks_from_playlist(self, id):
+        # Combine all compononets
+        tracks_feature_set = pd.concat(
+            [genre_df, key_df, time_sig_df, popularity_cols_df, floats_scaled], axis=1)
+        tracks_feature_set['id'] = track_dataset_df['track_id'].values
+
+        return tracks_feature_set
+
+    def __filter_user_playlist(self, playlist_id, all_tracks_df):
         """
-        Given a playlist id, returns a pandas dataframe consisting of key elements of each song
-        """
-        playlist = self.sp.playlist(id)
-        tracks = []
-        for item in playlist['tracks']['items']:
-            if item['track']['id'] is not None:
-                track = item['track']
-                track_id = track['id']
-                track_info = {
-                    'id': track_id,
-                    'duration_ms': track['duration_ms'],
-                    'explicit': track['explicit'],
-                    'popularity': track['popularity'],
-                    'date_added': item['added_at']
-                }
-                tracks.append(track_info)
-
-        tracks_df = pd.DataFrame(tracks)
-        tracks_df['date_added'] = pd.to_datetime(
-            tracks_df['date_added'], utc=True)
-        now = datetime.datetime.now(pytz.utc)
-        tracks_df['months_since_added'] = tracks_df['date_added'].apply(
-            lambda x: relativedelta(now, x).months)
-        tracks_df = tracks_df.drop(['date_added'], axis=1)
-
-        return tracks_df
-
-    def __extract_tracks_features(self, ids):
-        """
-        Given a list of track ids, returns a pandas dataframe of key audio features of each track
-        """
-        audio_features_list = []
-        for track_id in ids:
-            if track_id is not None:
-                audio_features = self.sp.audio_features(track_id)[0]
-                audio_features_list.append(audio_features)
-
-        # convert list of dictionaries to Pandas DataFrame
-        audio_features_df = pd.DataFrame.from_records(
-            audio_features_list, columns=audio_features_list[0].keys())
-
-        # add track ID column to DataFrame
-        audio_features_df['id'] = ids
-
-        # re-order columns to put track_id first
-        cols = audio_features_df.columns.tolist()
-        cols = cols[-1:] + cols[:-1]
-        audio_features_df = audio_features_df[cols]
-        audio_features_df = audio_features_df.drop(
-            ['type', 'id', 'uri', 'track_href', 'analysis_url', 'duration_ms'], axis=1)
-        return audio_features_df
-
-    def __create_playlist_df(self, id):
-        """
-        Returns a dataframe for the playlsit with the given id. Attributes include those returned by
-        Spotify Web API's GET Audio Features endpoint and track meta data like name, artist, etc.
-        """
-        df1 = self.__tracks_from_playlist(id)
-        df2 = self.__extract_tracks_features(df1['id'])
-        playlist_df = pd.concat([df1, df2], axis=1)
-        return playlist_df
-
-    def __create_playlist_vector(self, full_feature_set_df, playlist_df, weight_factor=1.2):
-        """
-        Generates a single vector desribing a playlist dataframe.
-        Removes those songs in the playlist from the full_feature_set_df
-
+        Given a user playlist that will be used to make recommendations based off,
+        return a 'filtered' playlist of the tracks that are available in the dataset.
         Parameters:
-        - full_feature_set_df: All tracks of the dataset
-        - playlist_df: Dataframe consisting of the songs in the playlist and their features
-        - weight_factor: value representing bias of more recently added songs
+        - playlist_id: id of the user playlist
+        - all_tracks_df: tracks dataset
         Returns:
-        - sum_vect: 1D vector summarizing the features of the playlist
-        - refined: All tracks in dataset as defined by full_feature_set_df, except those in the playlist_df
+        - refined_playlist_df: filtered playlist of songs in dataset
         """
-        # Compute full_feature_set_df
-        # refined_complete_df =
-        merged_df = pd.merge(
-            full_feature_set_df, playlist_df['id'], on='id', how='left', indicator=True)
-        pruned_df = merged_df[merged_df['_merge']
-                              == 'left_only'].drop(columns='_merge')
+        user_playlist = self.sp.playlist(playlist_id)
+        refined_playlist = pd.DataFrame()
+        for ix, i in enumerate(user_playlist['tracks']['items']):
+            if i['track'] is not None and i['track']['id'] is not None:
+                refined_playlist.loc[ix,
+                                     'artist'] = i['track']['artists'][0]['name']
+                refined_playlist.loc[ix, 'name'] = i['track']['name']
+                refined_playlist.loc[ix, 'id'] = i['track']['id']
+                refined_playlist.loc[ix,
+                                     'url'] = i['track']['album']['images'][1]['url']
+                refined_playlist.loc[ix, 'date_added'] = i['added_at']
 
-        playlist_df = playlist_df.drop(['id'], axis=1)
-        # Note: Popularity feature is not given in kaggle dataset;may need to drop that column as well.
-        playlist_df = playlist_df.drop(['popularity'], axis=1)
+        refined_playlist['date_added'] = pd.to_datetime(
+            refined_playlist['date_added'])
+        refined_playlist = refined_playlist[refined_playlist['id'].isin(
+            all_tracks_df['track_id'].values)].sort_values('date_added', ascending=False)
 
-        # Compute Weight for each song of playlist; given from their months_since_added
-        # More recent the song was added, the more weight is is given
-        playlist_df['weight'] = playlist_df['months_since_added'].apply(
-            lambda x: weight_factor ** (-x))
-        playlist_df.update(playlist_df.mul(playlist_df.weight, 0))
-        playlist_df = playlist_df.drop(
-            ['weight', 'months_since_added'], axis=1)
+        return refined_playlist
 
-        # Normalize Data (15 features)
-        df = playlist_df.apply(lambda iterator: (
-            (iterator - iterator.mean())/iterator.std()).round(2))
-        df_normalized = df.apply(lambda iterator: (
-            (iterator.max() - iterator)/(iterator.max() - iterator.min())).round(2))
-        sum_vect = df_normalized.sum(axis=0)
-
-        return sum_vect, pruned_df
-
-    def __generate_recommendations(self, spotify_df, playlist_vect, refined_feature_set):
+    def __create_playlist_vector(self, tracks_feature_set, refined_playlist, recency_bias=1.2):
         """
-        Return Recommenmdations based on playlist.
-
+        Vectorizes a user playlist by summarizing the playlist dataframe
+        into a single dataframe. 
+        Tunable paramateres: Recency Bias
         Parameters:
-        - spotify_df : Dataframe of all songs in spotify (or in the used dataset)
-        - playlist_vect: vector representing the playlist
-        - refined_feature_set: feature set of songs that are not in playlist
-
+        - tracks_feature_set: Full Feature set of each/all songs in dataset
+        - refined_playlist: Refined playlist dataframe (tracks that are in dataset)
+        - recency_bias: Weight value for how much to emphasize more recently added songs
         Returns:
-        - recommended_10_songs: Top 10 recommended songs based on playlists
+        - playlist_vector_weighted_final: Feature Vector summarizing playlist
+        - complete_feature_set_nonplaylist: Dataframe where each row is a feature 
+        vector for each track not in playlist in dataset
         """
+        feature_set_playlist = tracks_feature_set[tracks_feature_set['id'].isin(
+            refined_playlist['id'].values)]
+        feature_set_playlist = feature_set_playlist.merge(
+            refined_playlist[['id', 'date_added']], on='id', how='inner')
+        complete_feature_set_nonplaylist = tracks_feature_set[~tracks_feature_set['id'].isin(
+            refined_playlist['id'].values)]
 
-        non_playlist_df = spotify_df[spotify_df['id'].isin(
-            refined_feature_set['id'].values)]
-        non_playlist_df['sim'] = cosine_similarity(refined_feature_set.drop(
-            'id', axis=1).values, playlist_vect.values.reshape(1, -1))[:, 0]
-        recommended_10_songs = non_playlist_df.sort_values(
-            'sim', ascending=False).head(10)
-        recommended_10_songs['url'] = recommended_10_songs['id'].apply(
+        playlist_vector = feature_set_playlist.sort_values(
+            'date_added', ascending=False)
+        most_recent_date = playlist_vector.iloc[0, -1]
+
+        for ix, row in playlist_vector.iterrows():
+            playlist_vector.loc[ix, 'months_back'] = int(
+                (most_recent_date.to_pydatetime() - row.iloc[-1].to_pydatetime()).days / 30)
+
+        playlist_vector['weight'] = playlist_vector['months_back'].apply(
+            lambda x: recency_bias ** (-x))
+
+        playlist_vector_weighted = playlist_vector.copy()
+        playlist_vector_weighted.update(
+            playlist_vector_weighted.iloc[:, :-4].mul(playlist_vector_weighted.weight, 0))
+        playlist_vector_weighted_final = playlist_vector_weighted.iloc[:, :-4]
+
+        return playlist_vector_weighted_final.sum(axis=0), complete_feature_set_nonplaylist
+
+    def __generate_recommendations(self, all_tracks_df, playlist_vector, all_tracks_features, recommend_amt=10):
+        """
+        Generate recommendations based on the playlist vector, using
+        the all_tracks_features.
+        Parameters:
+        - all_tracks_df: All tracks and info in the dataset
+        - playlist_vector: Feature Vector summarizing playlist
+        - all_tracks_features: All features for each track not in playlist but in dataset
+        Returns:
+        - rec_10: 10 recommended tracks
+        """
+        non_playlist_df = all_tracks_df[all_tracks_df['track_id'].isin(
+            all_tracks_features['id'].values)]
+        non_playlist_df['sim'] = cosine_similarity(all_tracks_features.drop(
+            'id', axis=1).values, playlist_vector.values.reshape(1, -1))[:, 0]
+        recs = non_playlist_df.sort_values(
+            'sim', ascending=False).head(recommend_amt)
+        recs['url'] = recs['track_id'].apply(
             lambda x: self.sp.track(x)['album']['images'][1]['url'])
 
-        return recommended_10_songs
+        return recs
 
-    def recommend_tracks(self, playlist_id):
+    def recommend_tracks(self, playlist_id, recommend_amt=10):
         """
-        Recommend 10 tracks based off the playlist given by playlist_id.
-
-        Parameters:
-        - playlist_id: id of the playlist to recommend tracks off of.
-
+        Recommends tracks based off playlist specified by playlist_id.
+        Tracks are pulled from the spotify dataset specified.
+        Amount of tracks that are recommended are given by recommend_amt.
         Returns:
-        - recommended_10: 10 tracks recommended. (currentltly a data frame)
+        - recs: recommend tracks in dictionary format, {track_name : track_id}
         """
-        spotify_df = pd.read_csv('tracks_features.csv')
-        spotify_df = spotify_df.drop(
-            ['album_id', 'track_number', 'disc_number', 'year', 'release_date'], axis=1)
+        # Dataset of Spotify tracks Available to recommend from
+        spotify_dataset_df = pd.read_csv('SpotifyFeatures.csv')
 
-        full_feature_set_df = self.__create_feature_vectores(spotify_df)
-        playlist_df = self.__create_playlist_df(playlist_id)
-        playlist_vect, refined_feature_set = self.__create_playlist_vector(
-            full_feature_set_df, playlist_df)
-        recommended_10 = self.__generate_recommendations(
-            spotify_df, playlist_vect, refined_feature_set)
-
-        # Format recommended tracks as {name: id}
-
-        return recommended_10.set_index('id')['name'].to_dict()
+        refined_playlist = self.__filter_user_playlist(
+            playlist_id, spotify_dataset_df)
+        dataset_features = self.__create_feature_vectors(spotify_dataset_df)
+        playlist_vector, remaining_dataset_features = self.__create_playlist_vector(
+            dataset_features, refined_playlist)
+        recs = self.__generate_recommendations(
+            spotify_dataset_df, playlist_vector, remaining_dataset_features, recommend_amt)
+        recs_dict = recs.set_index('track_id')['track_name'].to_dict()
+        return recs_dict
 
     def playlists(self):
         """
@@ -214,7 +187,7 @@ class SpotifyRecommender:
             playlists[item['name']] = item['id']
 
         return playlists
-    
+
     def add_track_to_playlist(self, track_id, playlist_id):
         """
         Adds track with id track_id to user's playlist with
