@@ -1,6 +1,7 @@
 .env
 venv/
 .venv/
+server_venv/
 .cache
 *.csv
 __pycache__/
