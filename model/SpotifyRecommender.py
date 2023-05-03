@@ -18,9 +18,10 @@ class SpotifyRecommender:
     -  sp: Spotify object
     """
 
-    def __init__(self, auth_manager):
-        # load_dotenv()
-        self.sp = spotipy.Spotify(auth_manager=auth_manager)
+    def __init__(self):
+        load_dotenv()
+        self.sp = spotipy.Spotify(
+            auth_manager=SpotifyOAuth(scope="playlist-modify-public"))
 
     def __create_feature_vectors(self, track_dataset_df):
         """
