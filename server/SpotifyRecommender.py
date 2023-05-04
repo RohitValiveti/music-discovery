@@ -1,6 +1,4 @@
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
@@ -19,7 +17,6 @@ class SpotifyRecommender:
     """
 
     def __init__(self, auth_manager):
-        # load_dotenv()
         self.sp = spotipy.Spotify(auth_manager=auth_manager)
 
     def __create_feature_vectors(self, track_dataset_df):
@@ -177,13 +174,13 @@ class SpotifyRecommender:
     def playlists(self):
         """
         Returns the user's public playlists.
-        Formatted in {name : id}
+        Formatted in {id : name}
         """
         playlists_res = self.sp.current_user_playlists()['items']
         playlists = {}
 
         for item in playlists_res:
-            playlists[item['name']] = item['id']
+            playlists[item['id']] = item['name']
 
         return playlists
 
@@ -199,7 +196,8 @@ class SpotifyRecommender:
     def profile_info(self):
         """
         Returns profile statistics about the current user.
-        Info returned: display name, followers, number of public playlists.
+        Info returned: display name, followers, number of 
+        public playlists, and top 5 tracks of past 4 weeks.
         """
         response = self.sp.current_user()
 
@@ -209,4 +207,28 @@ class SpotifyRecommender:
         playlists = self.playlists()
         profile['public playlists'] = len(playlists)
 
+        top_tracks_res = self.sp.current_user_top_tracks(5, 0, "short_term")
+        top_tracks = [{"name": track['name'], "id": track['id']}
+                      for track in top_tracks_res["items"]]
+        profile["top_tracks"] = top_tracks
+
         return profile
+
+    def track_info(self, track_id):
+        """
+        Returns Essential information of a track.
+        """
+        try:
+            response = self.sp.track(track_id)
+        except spotipy.exceptions.SpotifyException as error:
+            return None
+        else:
+            track = {}
+            track['id'] = track_id
+            track["name"] = response['name']
+            track["album"] = response["album"]["name"]
+            artists_objs = response["artists"]
+            artists = [artist_obj["name"] for artist_obj in artists_objs]
+            track['artists'] = artists
+
+            return track
