@@ -138,7 +138,7 @@ def get_user_info():
     return success_response(sp.profile_info())
 
 
-@app.route('/add_track/')
+@app.route('/add-track/', methods=['POST'])
 def add_track_to_playlist():
     """
     Given a track id and playlist id,
@@ -148,6 +148,19 @@ def add_track_to_playlist():
     if not authenticated:
         return failure_response('not signed in', 401)
     sp = SpotifyRecommender(auth_manager=auth_manager)
+
+    body = json.loads(request.data)
+    track_id = body.get("track_id")
+    playlist_id = body.get("playlist_id")
+
+    if track_id is None or playlist_id is None:
+        return failure_response('Missing Track and/or Playlist id', 401)
+
+    sp.add_track_to_playlist(track_id, playlist_id)
+
+    track = sp.track_info(track_id)
+
+    return success_response(track)
 
 
 if __name__ == "__main__":
