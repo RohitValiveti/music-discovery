@@ -7,4 +7,4 @@ server_venv/
 __pycache__/
 .vscode/
 scratch.py
-*.flask_session/
+server/.flask_session/
