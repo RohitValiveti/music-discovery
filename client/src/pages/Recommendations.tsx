@@ -18,7 +18,6 @@ const Recommendations = () => {
           body: JSON.stringify({ playlist_id: id }),
         };
         const response = await fetch("/recommend/", requestOptions);
-        console.log(response);
         const data = await response.json();
         setTracks(data.recs);
       } catch (error) {
@@ -26,7 +25,7 @@ const Recommendations = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   const onItemClick = (track: FullTrack) => {
     setSelectedTrack(track);

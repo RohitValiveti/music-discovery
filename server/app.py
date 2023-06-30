@@ -206,5 +206,25 @@ def cover_from_track():
 
     return success_response(sp.track_cover(track_id))
 
+
+@app.route('/playlist-img')
+def get_playlist_cover():
+    """
+    Given the id of a playlist, returns the img url of the it.
+    """
+    authenticated, auth_manager = authenticate()
+    if not authenticated:
+        return failure_response('not signed in', 401)
+    sp = SpotifyRecommender(auth_manager=auth_manager)
+
+    body = json.loads(request.data)
+    playlist_id = body.get("playlist_id")
+
+    if playlist_id is None:
+        return failure_response('Missing Playlist id', 401)
+
+    return success_response(sp.playlist_cover(playlist_id))
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

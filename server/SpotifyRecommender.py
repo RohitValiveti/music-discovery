@@ -234,6 +234,8 @@ class SpotifyRecommender:
             artists_objs = response["artists"]
             artists = [artist_obj["name"] for artist_obj in artists_objs]
             track['artists'] = artists
+            img_url = response['album']['images'][0]['url']
+            track["album_img_url"] = img_url
 
             return track
 
@@ -248,3 +250,10 @@ class SpotifyRecommender:
         else:
             img_url = response['album']['images'][0]['url']
             return {"album_img_url": img_url}
+
+    def playlist_cover(self, playlist_id):
+        """
+        Returns url of image of playlist given the playlist id.
+        """
+        response = self.sp.playlist_cover_image(playlist_id)
+        return {"playlist_img_url": response[0]['url']}
