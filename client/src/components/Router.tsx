@@ -3,6 +3,8 @@ import Homepage from "../pages/Homepage";
 import Welcome from "../pages/Welcome";
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ChoosePlaylist from "../pages/ChoosePlaylist";
+import Recommendations from "../pages/Recommendations";
 
 const Router = () => {
   return (
@@ -12,6 +14,11 @@ const Router = () => {
         <Route path="/welcome" element={<Welcome />}></Route>
         <Route path="/signin" element={<Signin />}></Route>
         <Route path="/homepage" element={<Homepage />}></Route>
+        <Route path="/chooseplaylist" element={<ChoosePlaylist />}></Route>
+        <Route
+          path="/recommendations/:id"
+          element={<Recommendations />}
+        ></Route>
       </Routes>
     </BrowserRouter>
   );
