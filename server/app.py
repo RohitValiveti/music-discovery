@@ -2,7 +2,7 @@ import spotipy
 from SpotifyRecommender import SpotifyRecommender
 import json
 from dotenv import load_dotenv
-from flask import Flask, session, request, redirect
+from flask import Flask, session, request, redirect, url_for
 from flask_session import Session
 import os
 load_dotenv()
@@ -34,6 +34,32 @@ def authenticate():
         return True, auth_manager
 
 
+@app.route('/signin')
+def route_to_sign():
+    cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='playlist-modify-public user-top-read',
+                                               cache_handler=cache_handler,
+                                               show_dialog=True)
+
+    if request.args.get("code"):
+        # Step 2. Being redirected from Spotify auth page
+        print("22222222222")
+        auth_manager.get_access_token(request.args.get("code"))
+        print("333333333")
+        return redirect('/')
+
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        # Step 1. Display sign in link when no token
+        print("000000000000")
+        auth_url = auth_manager.get_authorize_url()
+        print("111111111")
+        return success_response({'sign_in_link': auth_url})
+
+    # Step 3. Signed in, display data
+    sp = SpotifyRecommender(auth_manager=auth_manager)
+    return success_response(cache_handler.get_cached_token())
+
+
 @app.route('/')
 def sign_in():
     cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
@@ -43,17 +69,21 @@ def sign_in():
 
     if request.args.get("code"):
         # Step 2. Being redirected from Spotify auth page
+        print("22222222222")
         auth_manager.get_access_token(request.args.get("code"))
+        print("333333333")
         return redirect('/')
 
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         # Step 1. Display sign in link when no token
+        print("000000000000")
         auth_url = auth_manager.get_authorize_url()
+        print("111111111")
         return success_response({'sign_in_link': auth_url})
 
     # Step 3. Signed in, display data
     sp = SpotifyRecommender(auth_manager=auth_manager)
-    return success_response(cache_handler.get_cached_token())
+    return redirect('http://localhost:3000/homepage')
 
 
 @app.route('/sign-out/')
