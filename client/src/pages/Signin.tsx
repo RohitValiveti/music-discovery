@@ -5,10 +5,10 @@ const Signin = () => {
     fetch("/signin")
       .then((response) => response.json())
       .then((data) => {
-        const link = data.sign_in_link; // Assuming the link is returned in a 'link' property
+        const link = data.sign_in_link;
         if (link) {
           // Open the link in a new tab or window
-          window.open(link, "_blank");
+          window.open(link);
         } else {
           // Redirect to the homepage
           window.location.href = "/homepage";

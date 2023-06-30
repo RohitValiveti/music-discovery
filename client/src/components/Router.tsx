@@ -1,7 +1,6 @@
 import Signin from "../pages/Signin";
 import Homepage from "../pages/Homepage";
 import Welcome from "../pages/Welcome";
-import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ChoosePlaylist from "../pages/ChoosePlaylist";
 import Recommendations from "../pages/Recommendations";

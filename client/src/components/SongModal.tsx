@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 type SongModalPropType = {
   id?: string;
@@ -47,6 +47,7 @@ const SongModal = ({
           ))}
         </p>
       )}
+      {/* Add Playback feature to hear song */}
       <button onClick={handleClick}>Add Track to your Playlist</button>
       {added && <div>Added to playlist!</div>}
       <br />
