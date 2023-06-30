@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FullTrack } from "../types/track";
+import SongModal from "../components/SongModal";
 
 const Recommendations = () => {
   const { id } = useParams();
   const [tracks, setTracks] = useState<FullTrack[]>([]);
+  const [selectedTrack, setSelectedTrack] = useState<FullTrack | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -24,15 +28,22 @@ const Recommendations = () => {
     fetchData();
   }, []);
 
+  const onItemClick = (track: FullTrack) => {
+    setSelectedTrack(track);
+    setShowModal(true);
+  };
+
   return (
     <div>
       {tracks.length !== 0 ? (
         <div>
           <h2>Your Recommendations based on this Playlist!</h2>
           {tracks.map((track) => (
-            <li key={track.id}>{track.name}</li>
-            // Add modal popul for clicking on each title (Dont add new page or else navigating back to recs will cause re load)
+            <li key={track.id} onClick={() => onItemClick(track)}>
+              {track.name}
+            </li>
           ))}
+          {showModal && <SongModal {...selectedTrack} playlist_id={id} />}
         </div>
       ) : (
         <p>Loading Recommendations...</p>
