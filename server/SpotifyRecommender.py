@@ -236,3 +236,15 @@ class SpotifyRecommender:
             track['artists'] = artists
 
             return track
+
+    def track_cover(self, track_id):
+        """
+        Returns URL for Album cover of a track/
+        """
+        try:
+            response = self.sp.track(track_id)
+        except spotipy.exceptions.SpotifyException as error:
+            return None
+        else:
+            img_url = response['album']['images'][0]['url']
+            return {"album_img_url": img_url}

@@ -187,5 +187,24 @@ def add_track_to_playlist():
     return success_response(track)
 
 
+@app.route('/track-cover')
+def cover_from_track():
+    """
+    Given the track id, returns the link for the album cover image 
+    of the album that the track is in
+    """
+    authenticated, auth_manager = authenticate()
+    if not authenticated:
+        return failure_response('not signed in', 401)
+    sp = SpotifyRecommender(auth_manager=auth_manager)
+
+    body = json.loads(request.data)
+    track_id = body.get("track_id")
+
+    if track_id is None:
+        return failure_response('Missing Track id', 401)
+
+    return success_response(sp.track_cover(track_id))
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
