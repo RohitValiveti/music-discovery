@@ -174,15 +174,19 @@ class SpotifyRecommender:
     def playlists(self):
         """
         Returns the user's public playlists.
-        Formatted in {id : name}
+        Formatted in {playlists : [playlist]}
         """
         playlists_res = self.sp.current_user_playlists()['items']
-        playlists = {}
+        playlists = []
 
         for item in playlists_res:
-            playlists[item['id']] = item['name']
+            playlist = {
+                'name': item['name'],
+                'id': item['id']
+            }
+            playlists.append(playlist)
 
-        return playlists
+        return {"playlists": playlists}
 
     def add_track_to_playlist(self, track_id, playlist_id):
         """

@@ -108,13 +108,15 @@ def get_recs():
     if not authenticated:
         return failure_response('not signed in', 401)
     sp = SpotifyRecommender(auth_manager=auth_manager)
-    playlists = sp.playlists()
+    playlists = sp.playlists().get('playlists')
     body = json.loads(request.data)
     playlist_id = body.get("playlist_id")
 
+    if playlists is None:
+        return failure_response("Error Retrieving playlists", 500)
     if playlist_id is None:
         return failure_response("Please Supply Playlist Id", 400)
-    if not (playlist_id in playlists):
+    if not (any(item["id"] == playlist_id for item in playlists)):
         return failure_response("Not a valid playlist", 400)
 
     recs = sp.recommend_tracks(playlist_id)
