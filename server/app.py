@@ -98,7 +98,7 @@ def get_playlists():
     return success_response(playlists)
 
 
-@app.route('/recommend/')
+@app.route('/recommend/', methods=["GET", "POST"])
 def get_recs():
     """
     Given a playlist id in the request body, 
@@ -108,6 +108,7 @@ def get_recs():
     if not authenticated:
         return failure_response('not signed in', 401)
     sp = SpotifyRecommender(auth_manager=auth_manager)
+
     playlists = sp.playlists().get('playlists')
     body = json.loads(request.data)
     playlist_id = body.get("playlist_id")
@@ -119,8 +120,10 @@ def get_recs():
     if not (any(item["id"] == playlist_id for item in playlists)):
         return failure_response("Not a valid playlist", 400)
 
-    recs = sp.recommend_tracks(playlist_id)
-    return success_response(recs)
+    # Format Recs Array:
+    rec_res = [sp.track_info(id) for id in sp.recommend_tracks(playlist_id)]
+
+    return success_response({"recs": rec_res})
 
 
 @app.route("/song/")
