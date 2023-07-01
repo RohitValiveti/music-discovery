@@ -36,22 +36,25 @@ const SongModal = ({
   };
 
   return (
-    <div>
-      <h3>{name}</h3>
-      <p>Album: {album}</p>
+    <div className="music-panel">
+      <h3 className="music-panel__title">{name}</h3>
+      <p className="music-panel__album">Album: {album}</p>
       {artists && (
-        <p>
+        <p className="music-panel__artists">
           Artist(s):{" "}
-          {artists.map((artist) => (
-            <p>{artist}</p>
+          {artists.map((artist, index) => (
+            <span key={index} className="music-panel__artist">
+              {artist}
+            </span>
           ))}
         </p>
       )}
-      {/* Add Playback feature to hear song */}
-      <button onClick={handleClick}>Add Track to your Playlist</button>
-      {added && <div>Added to playlist!</div>}
+      <button className="music-panel__button" onClick={handleClick}>
+        Add Track to your Playlist
+      </button>
+      {added && <div className="music-panel__message">Added to playlist!</div>}
       <br />
-      <img src={album_img_url} alt="album" />
+      <img className="music-panel__image" src={album_img_url} alt="album" />
     </div>
   );
 };

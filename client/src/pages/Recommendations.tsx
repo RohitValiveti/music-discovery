@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { FullTrack } from "../types/track";
 import SongModal from "../components/SongModal";
 import SyncLoader from "react-spinners/SyncLoader";
 import { Typography } from "@mui/material";
+import FastRewindIcon from "@mui/icons-material/FastRewind";
 
 const Recommendations = () => {
   const { id } = useParams();
@@ -46,6 +47,33 @@ const Recommendations = () => {
 
   return (
     <div>
+      <Link
+        to={"/chooseplaylist"}
+        style={{
+          color: "#1db954",
+          textDecoration: "none",
+          border: "1px solid #1db954",
+          borderRadius: "4px",
+          padding: "8px",
+          marginBottom: "8px",
+          cursor: "pointer",
+          display: "inline-block",
+          marginRight: "10px",
+        }}
+      >
+        <FastRewindIcon
+          fontSize="large"
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "35px",
+            cursor: "pointer",
+          }}
+        />
+        <br></br>
+        <br></br>
+        <div>Back to playlists</div>
+      </Link>
       {tracks.length !== 0 ? (
         <div>
           <div className="homepage" style={{ color: "#535353" }}>
@@ -66,8 +94,6 @@ const Recommendations = () => {
                     cursor: "pointer",
                     display: "inline-block",
                     marginRight: "10px",
-                    transition: "background-color 0.3s",
-                    backgroundColor: "#fff",
                   }}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
