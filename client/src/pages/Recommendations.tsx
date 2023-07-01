@@ -34,16 +34,49 @@ const Recommendations = () => {
     setShowModal(true);
   };
 
+  const handleMouseEnter = (e: React.MouseEvent<HTMLLIElement>) => {
+    const liElement = e.target as HTMLLIElement;
+    liElement.style.backgroundColor = "#b3b3b3";
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLLIElement>) => {
+    const liElement = e.target as HTMLLIElement;
+    liElement.style.backgroundColor = "#fff";
+  };
+
   return (
     <div>
       {tracks.length !== 0 ? (
         <div>
-          <h2>Your Recommendations based on this Playlist!</h2>
-          {tracks.map((track) => (
-            <li key={track.id} onClick={() => onItemClick(track)}>
-              {track.name}
-            </li>
-          ))}
+          <div className="homepage" style={{ color: "#535353" }}>
+            <Typography variant="h3" style={{ padding: 20 }}>
+              Your Recommendations based on this Playlist
+            </Typography>
+            <ul style={{ listStyleType: "none", padding: 0 }}>
+              {tracks.map((track) => (
+                <li
+                  className="rec-item"
+                  key={track.id}
+                  onClick={() => onItemClick(track)}
+                  style={{
+                    border: "1px solid #1db954",
+                    borderRadius: "4px",
+                    padding: "8px",
+                    marginBottom: "8px",
+                    cursor: "pointer",
+                    display: "inline-block",
+                    marginRight: "10px",
+                    transition: "background-color 0.3s",
+                    backgroundColor: "#fff",
+                  }}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {track.name}
+                </li>
+              ))}
+            </ul>
+          </div>
           {showModal && <SongModal {...selectedTrack} playlist_id={id} />}
         </div>
       ) : (
