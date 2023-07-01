@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FullTrack } from "../types/track";
 import SongModal from "../components/SongModal";
+import SyncLoader from "react-spinners/SyncLoader";
+import { Typography } from "@mui/material";
 
 const Recommendations = () => {
   const { id } = useParams();
@@ -45,7 +47,14 @@ const Recommendations = () => {
           {showModal && <SongModal {...selectedTrack} playlist_id={id} />}
         </div>
       ) : (
-        <p>Loading Recommendations...</p>
+        <Typography
+          variant="h6"
+          className="loader"
+          style={{ color: "#535353" }}
+        >
+          <SyncLoader color="#1db954" />
+          Generating Recommendations
+        </Typography>
       )}
     </div>
   );

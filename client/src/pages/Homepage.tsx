@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { User } from "../types/user";
 import { Link } from "react-router-dom";
+import SyncLoader from "react-spinners/SyncLoader";
+import {
+  Button,
+  List,
+  ListItem,
+  ThemeProvider,
+  Typography,
+} from "@mui/material";
+import theme from "../types/Theme";
 
 const Homepage = () => {
   const [userInfo, setUserInfo] = useState<User | null>(null);
@@ -18,23 +27,56 @@ const Homepage = () => {
   }, []);
 
   return (
-    <div>
+    <div className="homepage">
       {userInfo ? (
-        <div>
-          <h2>Welcome!</h2>
-          <p>Name: {userInfo.name}</p>
-          <p>Followers: {userInfo.followers}</p>
-          <p>Public Playlists: {userInfo.public_playlists}</p>
-          <p>
-            Top Tracks:
+        <div style={{ color: "#535353" }}>
+          <Typography variant="h3" style={{ padding: 40 }}>
+            Welcome {userInfo.name}!
+          </Typography>
+          <Typography variant="h5">
+            Here's a little about yourself if you forgot:
+          </Typography>
+          <Typography variant="h6">
+            You have {userInfo.followers} followers and{" "}
+            {userInfo.public_playlists} public playlist(s).
+          </Typography>
+          <Typography variant="h6">
+            And these were your top tracks over the last 4 weeks:
+          </Typography>
+          <List
+            style={{
+              display: "grid",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 40,
+            }}
+          >
             {userInfo.top_tracks.map((track, idx) => (
-              <li key={idx}>{track.name}</li>
+              <ListItem key={idx}>{track.name}</ListItem>
             ))}
-          </p>
-          <Link to={"/chooseplaylist"}>Disover Music</Link>
+          </List>
+          <div>
+            <ThemeProvider theme={theme}>
+              <Button variant="contained" color="primary" className="elt">
+                <Link
+                  to={"/chooseplaylist"}
+                  style={{ color: "white", textDecoration: "none" }}
+                >
+                  Disover Personalized Music
+                </Link>
+              </Button>
+            </ThemeProvider>
+          </div>
         </div>
       ) : (
-        <p>Loading user data...</p>
+        <Typography
+          variant="h6"
+          className="loader"
+          style={{ color: "#535353" }}
+        >
+          <SyncLoader color="#1db954" />
+          Loading Profile Content
+        </Typography>
       )}
     </div>
   );

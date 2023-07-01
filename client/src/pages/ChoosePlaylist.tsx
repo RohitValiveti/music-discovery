@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Playlist } from "../types/playlist";
 import { Link } from "react-router-dom";
+import { Typography } from "@mui/material";
+import SyncLoader from "react-spinners/SyncLoader";
 
 const ChoosePlaylist = () => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -32,7 +34,14 @@ const ChoosePlaylist = () => {
             ))}
           </div>
         ) : (
-          <p>Loading Playlists...</p>
+          <Typography
+            variant="h6"
+            className="loader"
+            style={{ color: "#535353" }}
+          >
+            <SyncLoader color="#1db954" />
+            Loading Playlists
+          </Typography>
         )}
       </div>
     </>
