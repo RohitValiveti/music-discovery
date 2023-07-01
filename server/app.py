@@ -187,6 +187,27 @@ def add_track_to_playlist():
     return success_response(track)
 
 
+@app.route('/top-tracks')
+def get_top_tracks():
+    """
+    Returns top tracks of user over specified time span
+    """
+    authenticated, auth_manager = authenticate()
+    if not authenticated:
+        return failure_response('not signed in', 401)
+    sp = SpotifyRecommender(auth_manager=auth_manager)
+
+    body = json.loads(request.data)
+    term = body.get("term")
+
+    if term is None:
+        return failure_response('Need to specified term length', 401)
+    if term != 'short' and term != 'medium' and term != 'long':
+        return failure_response('Term lengths must only be short, medium, or long', 401)
+
+    return success_response(sp.term_tracks(term))
+
+
 @app.route('/track-cover')
 def cover_from_track():
     """

@@ -218,6 +218,23 @@ class SpotifyRecommender:
 
         return profile
 
+    def term_tracks(self, term):
+        """
+        Returns User's top tracks over last 4 weeks, 6 months, or lifetime
+        """
+        if term == 'medium':
+            top_tracks_res = self.sp.current_user_top_tracks(
+                5, 0, "medium_term")
+        elif term == 'long':
+            top_tracks_res = self.sp.current_user_top_tracks(5, 0, "long_term")
+        else:
+            top_tracks_res = self.sp.current_user_top_tracks(
+                5, 0, "short_term")
+
+        top_tracks = [{"name": track['name'], "id": track['id']}
+                      for track in top_tracks_res["items"]]
+        return {"tracks": top_tracks}
+
     def track_info(self, track_id):
         """
         Returns Essential information of a track.
