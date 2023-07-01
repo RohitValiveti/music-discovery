@@ -208,7 +208,7 @@ class SpotifyRecommender:
         profile = {}
         profile['followers'] = response['followers']['total']
         profile['name'] = response['display_name']
-        playlists = self.playlists()
+        playlists = self.playlists()["playlists"]
         profile['public_playlists'] = len(playlists)
 
         top_tracks_res = self.sp.current_user_top_tracks(5, 0, "short_term")
