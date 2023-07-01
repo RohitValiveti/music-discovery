@@ -30,7 +30,7 @@ const ChoosePlaylist = () => {
       {playlists.length !== 0 ? (
         <div>
           <Typography variant="h4" style={{ padding: 40 }}>
-            Choose A Playlist to generate Recommendations From!
+            Choose a playlist to generate recommendations from
           </Typography>
           <List
             style={{
