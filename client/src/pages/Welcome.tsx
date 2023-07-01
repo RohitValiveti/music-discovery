@@ -22,7 +22,7 @@ const Welcome = () => {
       });
   };
   return (
-    <div className="container">
+    <div className="container" style={{ color: "#535353" }}>
       <Typography variant="h3" className="elt">
         Spotify Music Recommender
       </Typography>
