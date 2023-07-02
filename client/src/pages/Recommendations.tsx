@@ -5,12 +5,14 @@ import SongModal from "../components/SongModal";
 import SyncLoader from "react-spinners/SyncLoader";
 import { Typography } from "@mui/material";
 import LastPage from "../components/LastPage";
+import { PlaylistImg } from "../types/playlist";
 
 const Recommendations = () => {
   const { id } = useParams();
   const [tracks, setTracks] = useState<FullTrack[]>([]);
   const [selectedTrack, setSelectedTrack] = useState<FullTrack | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [playlistImg, setPlaylistImg] = useState<PlaylistImg | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +25,17 @@ const Recommendations = () => {
         const response = await fetch("/recommend/", requestOptions);
         const data = await response.json();
         setTracks(data.recs);
+
+        const playlistReqOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ playlist_id: id }),
+        };
+
+        const imgRes = await fetch("/playlist-info/", playlistReqOptions);
+        const imgData = await imgRes.json();
+        console.log(imgData);
+        setPlaylistImg(imgData);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -52,7 +65,7 @@ const Recommendations = () => {
           <LastPage endpoint={"/choosePlaylists"} pageName="playlists" />
           <div className="homepage" style={{ color: "#535353" }}>
             <Typography variant="h3" style={{ padding: 20 }}>
-              Your Recommendations based on <strong>PLAYLIST</strong>
+              Your Recommendations based on <strong>{playlistImg?.name}</strong>
             </Typography>
             <ul style={{ listStyleType: "none", padding: 0 }}>
               {tracks.map((track) => (
