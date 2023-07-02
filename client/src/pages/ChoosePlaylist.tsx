@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import SyncLoader from "react-spinners/SyncLoader";
+import LastPage from "../components/LastPage";
 
 const ChoosePlaylist = () => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -26,36 +27,39 @@ const ChoosePlaylist = () => {
   }, []);
 
   return (
-    <div className="homepage" style={{ color: "#535353" }}>
+    <div style={{ color: "#535353" }}>
       {playlists.length !== 0 ? (
         <div>
-          <Typography variant="h4" style={{ padding: 40 }}>
-            Choose a playlist to generate recommendations from
-          </Typography>
-          <List
-            style={{
-              display: "grid",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: 20,
-            }}
-          >
-            {playlists.map((playlist) => (
-              <ListItem disablePadding key={playlist.id}>
-                <Link
-                  to={`/recommendations/${playlist.id}`}
-                  style={{ color: "#212121", textDecoration: "none" }}
-                >
-                  <ListItemButton>
-                    <ListItemText
-                      primary={playlist.name}
-                      style={{ fontSize: 40 }}
-                    />
-                  </ListItemButton>
-                </Link>
-              </ListItem>
-            ))}
-          </List>
+          <LastPage endpoint={"/homepage"} pageName="homepage" />
+          <div className="homepage">
+            <Typography variant="h4" style={{ padding: 40 }}>
+              Choose a playlist to generate recommendations from
+            </Typography>
+            <List
+              style={{
+                display: "grid",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: 20,
+              }}
+            >
+              {playlists.map((playlist) => (
+                <ListItem disablePadding key={playlist.id}>
+                  <Link
+                    to={`/recommendations/${playlist.id}`}
+                    style={{ color: "#212121", textDecoration: "none" }}
+                  >
+                    <ListItemButton>
+                      <ListItemText
+                        primary={playlist.name}
+                        style={{ fontSize: 40 }}
+                      />
+                    </ListItemButton>
+                  </Link>
+                </ListItem>
+              ))}
+            </List>
+          </div>
         </div>
       ) : (
         <Typography

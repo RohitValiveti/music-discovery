@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import theme from "../types/Theme";
+import LastPage from "../components/LastPage";
 
 const Homepage = () => {
   const [userInfo, setUserInfo] = useState<User | null>(null);
@@ -27,45 +28,48 @@ const Homepage = () => {
   }, []);
 
   return (
-    <div className="homepage">
+    <div>
       {userInfo ? (
-        <div style={{ color: "#535353" }}>
-          <Typography variant="h3" style={{ padding: 40 }}>
-            Welcome {userInfo.name}!
-          </Typography>
-          <Typography variant="h5">
-            Here's a little about yourself if you forgot:
-          </Typography>
-          <Typography variant="h6">
-            You have {userInfo.followers} followers and{" "}
-            {userInfo.public_playlists} public playlist(s).
-          </Typography>
-          <Typography variant="h6">
-            And these were your top tracks over the last 4 weeks:
-          </Typography>
-          <List
-            style={{
-              display: "grid",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: 40,
-            }}
-          >
-            {userInfo.top_tracks.map((track, idx) => (
-              <ListItem key={idx}>{track.name}</ListItem>
-            ))}
-          </List>
-          <div>
-            <ThemeProvider theme={theme}>
-              <Button variant="contained" color="primary" className="elt">
-                <Link
-                  to={"/chooseplaylist"}
-                  style={{ color: "white", textDecoration: "none" }}
-                >
-                  Disover Personalized Music
-                </Link>
-              </Button>
-            </ThemeProvider>
+        <div>
+          <LastPage endpoint={"/"} pageName="sign in" />
+          <div style={{ color: "#535353" }} className="homepage">
+            <Typography variant="h3" style={{ padding: 40 }}>
+              Welcome {userInfo.name}!
+            </Typography>
+            <Typography variant="h5">
+              Here's a little about yourself if you forgot:
+            </Typography>
+            <Typography variant="h6">
+              You have {userInfo.followers} followers and{" "}
+              {userInfo.public_playlists} public playlist(s).
+            </Typography>
+            <Typography variant="h6">
+              And these were your top tracks over the last 4 weeks:
+            </Typography>
+            <List
+              style={{
+                display: "grid",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: 40,
+              }}
+            >
+              {userInfo.top_tracks.map((track, idx) => (
+                <ListItem key={idx}>{track.name}</ListItem>
+              ))}
+            </List>
+            <div>
+              <ThemeProvider theme={theme}>
+                <Button variant="contained" color="primary" className="elt">
+                  <Link
+                    to={"/chooseplaylist"}
+                    style={{ color: "white", textDecoration: "none" }}
+                  >
+                    Disover Personalized Music
+                  </Link>
+                </Button>
+              </ThemeProvider>
+            </div>
           </div>
         </div>
       ) : (

@@ -4,7 +4,7 @@ import { FullTrack } from "../types/track";
 import SongModal from "../components/SongModal";
 import SyncLoader from "react-spinners/SyncLoader";
 import { Typography } from "@mui/material";
-import FastRewindIcon from "@mui/icons-material/FastRewind";
+import LastPage from "../components/LastPage";
 
 const Recommendations = () => {
   const { id } = useParams();
@@ -49,38 +49,10 @@ const Recommendations = () => {
     <div>
       {tracks.length !== 0 ? (
         <div>
-          <Link
-            to={"/chooseplaylist"}
-            style={{
-              color: "#1db954",
-              textDecoration: "none",
-              border: "1px solid #1db954",
-              borderRadius: "4px",
-              padding: "8px",
-              marginBottom: "8px",
-              cursor: "pointer",
-              display: "inline-block",
-              marginRight: "10px",
-            }}
-          >
-            <FastRewindIcon
-              fontSize="large"
-              style={{
-                position: "absolute",
-                top: "10px",
-                left: "35px",
-                cursor: "pointer",
-              }}
-            />
-            <br></br>
-            <br></br>
-            <div>
-              <strong>Back to playlists</strong>
-            </div>
-          </Link>
+          <LastPage endpoint={"/choosePlaylists"} pageName="playlists" />
           <div className="homepage" style={{ color: "#535353" }}>
             <Typography variant="h3" style={{ padding: 20 }}>
-              Your Recommendations based on this Playlist
+              Your Recommendations based on <strong>PLAYLIST</strong>
             </Typography>
             <ul style={{ listStyleType: "none", padding: 0 }}>
               {tracks.map((track) => (
