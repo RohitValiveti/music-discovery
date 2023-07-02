@@ -228,8 +228,8 @@ def cover_from_track():
     return success_response(sp.track_cover(track_id))
 
 
-@app.route('/playlist-info')
-def get_playlist_cover():
+@app.route('/playlist-info/', methods=["GET", "POST"])
+def get_playlist_info():
     """
     Given the id of a playlist, returns the img url and name of it
     """
