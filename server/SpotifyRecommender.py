@@ -270,7 +270,13 @@ class SpotifyRecommender:
 
     def playlist_cover(self, playlist_id):
         """
-        Returns url of image of playlist given the playlist id.
+        Returns name and image url of playlist given the playlist id.
         """
-        response = self.sp.playlist_cover_image(playlist_id)
-        return {"playlist_img_url": response[0]['url']}
+        response = {}
+        img = self.sp.playlist_cover_image(playlist_id)
+        response["playlist_img_url"] = img[0]['url']
+
+        response["name"] = next((playlist['name'] for playlist in self.playlists()[
+                                'playlists'] if playlist['id'] == playlist_id), None)
+
+        return response

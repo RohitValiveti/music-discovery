@@ -228,10 +228,10 @@ def cover_from_track():
     return success_response(sp.track_cover(track_id))
 
 
-@app.route('/playlist-img')
+@app.route('/playlist-info')
 def get_playlist_cover():
     """
-    Given the id of a playlist, returns the img url of the it.
+    Given the id of a playlist, returns the img url and name of it
     """
     authenticated, auth_manager = authenticate()
     if not authenticated:
