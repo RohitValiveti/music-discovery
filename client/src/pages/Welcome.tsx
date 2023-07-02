@@ -1,6 +1,5 @@
 import { Button, ThemeProvider, Typography } from "@mui/material";
 import React from "react";
-import { Link } from "react-router-dom";
 import theme from "../types/Theme";
 import "./styles.css";
 const Welcome = () => {
