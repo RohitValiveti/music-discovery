@@ -16,8 +16,6 @@ const LastPage = ({ endpoint, pageName }: LastPagePropType) => {
         textDecoration: "none",
         border: "1px solid #1db954",
         borderRadius: "4px",
-        padding: "8px",
-        marginBottom: "8px",
         cursor: "pointer",
         display: "inline-block",
         marginRight: "10px",

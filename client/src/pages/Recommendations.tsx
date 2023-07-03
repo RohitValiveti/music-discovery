@@ -60,13 +60,36 @@ const Recommendations = () => {
 
   return (
     <div>
-      {tracks.length !== 0 ? (
+      {tracks.length !== 0 && playlistImg ? (
         <div>
           <LastPage endpoint={"/choosePlaylists"} pageName="playlists" />
           <div className="homepage" style={{ color: "#535353" }}>
-            <Typography variant="h3" style={{ padding: 20 }}>
-              Your Recommendations based on <strong>{playlistImg?.name}</strong>
-            </Typography>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                margin: "0 auto",
+                maxWidth: "1000px",
+              }}
+            >
+              <Typography variant="h3" style={{ padding: 5 }}>
+                Your Recommendations based on{" "}
+                <strong>{playlistImg.name}</strong>
+              </Typography>
+              <div
+                style={{
+                  border: "2px solid #1db954",
+                  borderRadius: "4px",
+                  marginLeft: "10px",
+                }}
+              >
+                <img
+                  src={playlistImg.playlist_img_url}
+                  alt="playlist"
+                  style={{ width: "200px", height: "200px" }}
+                />
+              </div>
+            </div>
             <ul style={{ listStyleType: "none", padding: 0 }}>
               {tracks.map((track) => (
                 <li
