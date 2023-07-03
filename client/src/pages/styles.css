@@ -1,3 +1,5 @@
+/*Welcome Styles*/
+
 .container {
   justify-content: center;
   align-items: center;
@@ -9,6 +11,8 @@
   padding-bottom: 5%;
 }
 
+/*Homepage Styles*/
+
 .loader {
   justify-content: center;
   align-items: center;
@@ -16,15 +20,22 @@
   padding-top: 25%;
 }
 
+/*Homepage Styles*/
+
 .homepage {
   justify-content: center;
   align-items: center;
   text-align: center;
 }
 
-/*Song Modal*/
+.homepage-list {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  padding: 40;
+}
 
-/* styles.css */
+/*Song Modal Styles*/
 
 .music-panel {
   display: flex;
@@ -76,4 +87,52 @@
   width: 200px;
   height: auto;
   margin-top: 20px;
+}
+
+/* Choose Playlists Styles*/
+.playlist-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.playlist-card {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  border: 1px solid #1db954;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.playlist-box {
+  display: flex;
+  align-items: center;
+}
+
+/* Recommednations Styles*/
+
+.rec-container {
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  max-width: 1000px;
+}
+
+.rec-image {
+  border: 2px solid #1db954;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.rec-item {
+  border: 1px solid #1db954;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: inline-block;
+  margin-right: 10px;
 }

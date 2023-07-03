@@ -64,25 +64,12 @@ const Recommendations = () => {
         <div>
           <LastPage endpoint={"/choosePlaylist"} pageName="playlists" />
           <div className="homepage" style={{ color: "#535353" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                margin: "0 auto",
-                maxWidth: "1000px",
-              }}
-            >
+            <div className="rec-container">
               <Typography variant="h3" style={{ padding: 5 }}>
                 Your Recommendations based on{" "}
                 <strong>{playlistImg.name}</strong>
               </Typography>
-              <div
-                style={{
-                  border: "2px solid #1db954",
-                  borderRadius: "4px",
-                  marginLeft: "10px",
-                }}
-              >
+              <div className="rec-image">
                 <img
                   src={playlistImg.playlist_img_url}
                   alt="playlist"
@@ -96,15 +83,6 @@ const Recommendations = () => {
                   className="rec-item"
                   key={track.id}
                   onClick={() => onItemClick(track)}
-                  style={{
-                    border: "1px solid #1db954",
-                    borderRadius: "4px",
-                    padding: "8px",
-                    marginBottom: "8px",
-                    cursor: "pointer",
-                    display: "inline-block",
-                    marginRight: "10px",
-                  }}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >

@@ -42,46 +42,21 @@ const ChoosePlaylist = () => {
             <Typography variant="h4" style={{ padding: 40 }}>
               Choose a playlist to generate recommendations from
             </Typography>
-            <List
-              style={{
-                display: "grid", // Edit: Display as grid
-                gridTemplateColumns: "repeat(3, 1fr)", // Edit: Display in rows of 3
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 20,
-                gap: 20, // Add gap between items
-              }}
-            >
+            <List className="playlist-list">
               {playlists.map((playlist) => (
                 <ListItem disablePadding key={playlist.id}>
                   <Link
                     to={`/recommendations/${playlist.id}`}
                     style={{ color: "#212121", textDecoration: "none" }}
                   >
-                    <Card
-                      sx={{
-                        display: "flex",
-                        height: "100%", // Set the desired height
-                        width: "100%", // Set the desired width
-                        border: "1px solid #1db954", // Add border style
-                        borderRadius: "4px", // Add border radius
-                        overflow: "hidden", // Ensure the border doesn't affect the dimensions
-                      }}
-                    >
+                    <Card className="playlist-card">
                       <Box sx={{ display: "flex", flexDirection: "column" }}>
                         <CardContent sx={{ flex: "1 0 auto" }}>
                           <Typography component="div" variant="h5">
                             {playlist.name}
                           </Typography>
                         </CardContent>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            pl: 1,
-                            pb: 1,
-                          }}
-                        >
+                        <Box className="playlist-box">
                           <IconButton aria-label="previous">
                             {theme.direction === "rtl" ? (
                               <SkipNextIcon />

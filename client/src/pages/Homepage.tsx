@@ -46,14 +46,7 @@ const Homepage = () => {
             <Typography variant="h6">
               And these were your top tracks over the last 4 weeks:
             </Typography>
-            <List
-              style={{
-                display: "grid",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 40,
-              }}
-            >
+            <List className="homepage-list">
               {userInfo.top_tracks.map((track, idx) => (
                 <ListItem key={idx}>{track.name}</ListItem>
               ))}
