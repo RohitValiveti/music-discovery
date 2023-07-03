@@ -37,6 +37,8 @@ const SongModal = ({
 
   return (
     <div className="music-panel">
+  <div className="music-panel__content">
+    <div className="music-panel__info">
       <h3 className="music-panel__title">{name}</h3>
       <p className="music-panel__album">Album: {album}</p>
       {artists && (
@@ -53,9 +55,11 @@ const SongModal = ({
         Add Track to your Playlist
       </button>
       {added && <div className="music-panel__message">Added to playlist!</div>}
-      <br />
-      <img className="music-panel__image" src={album_img_url} alt="album" />
     </div>
+    <img className="music-panel__image" src={album_img_url} alt="album" />
+  </div>
+</div>
+
   );
 };
 
