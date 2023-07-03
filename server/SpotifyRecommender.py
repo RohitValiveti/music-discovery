@@ -209,7 +209,7 @@ class SpotifyRecommender:
         profile = {}
         profile['followers'] = response['followers']['total']
         profile['name'] = response['display_name']
-        profile["user_img_url"] = response["images"][0]["url"]
+        profile["user_img_url"] = response["images"][1]["url"]
         playlists = self.playlists()["playlists"]
         profile['public_playlists'] = len(playlists)
 
