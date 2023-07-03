@@ -62,7 +62,7 @@ const Recommendations = () => {
     <div>
       {tracks.length !== 0 && playlistImg ? (
         <div>
-          <LastPage endpoint={"/choosePlaylists"} pageName="playlists" />
+          <LastPage endpoint={"/choosePlaylist"} pageName="playlists" />
           <div className="homepage" style={{ color: "#535353" }}>
             <div
               style={{

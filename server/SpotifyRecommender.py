@@ -182,7 +182,8 @@ class SpotifyRecommender:
         for item in playlists_res:
             playlist = {
                 'name': item['name'],
-                'id': item['id']
+                'id': item['id'],
+                'playlist_img_url': item['images'][0]['url']
             }
             playlists.append(playlist)
 
