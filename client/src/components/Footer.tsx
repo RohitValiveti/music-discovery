@@ -6,17 +6,16 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 const Footer = () => {
   return (
     <Box component="footer" className="footer">
-      <Typography variant="body2" sx={{ mr: 2 }}>
-        Created by Rohit Valiveti
-      </Typography>
       <Link
         href="https://rohitvaliveti.github.io"
         target="_blank"
         rel="noopener noreferrer"
         color="inherit"
-        sx={{ mr: 2, textDecoration: "none" }}
+        sx={{ mr: 2 }}
       >
-        Website
+        <Typography variant="body2" sx={{ mr: 2 }}>
+          Created by Rohit Valiveti
+        </Typography>
       </Link>
       <Link
         href="https://github.com/RohitValiveti"
