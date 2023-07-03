@@ -5,5 +5,5 @@ export type User = {
   name: string;
   public_playlists: number;
   top_tracks: Track[];
-  user_img_url: string
+  user_img_url: string;
 };

@@ -14,12 +14,16 @@ app.config['SESSION_FILE_DIR'] = './.flask_session/'
 Session(app)
 
 
+############ HELPER METHODS ############
+
 def success_response(data, code=200):
     return json.dumps(data), code
 
 
 def failure_response(msg, code):
     return json.dumps({"error": msg}), code
+
+############ AUTHENTICATION ############
 
 
 def authenticate():
@@ -85,6 +89,8 @@ def sign_out():
         return redirect('/')
 
 
+############ PLAYLIST ROUTES ############
+
 @app.route('/playlists/')
 def get_playlists():
     """
@@ -96,70 +102,6 @@ def get_playlists():
     sp = SpotifyRecommender(auth_manager=auth_manager)
     playlists = sp.playlists()
     return success_response(playlists)
-
-
-@app.route('/recommend/', methods=["GET", "POST"])
-def get_recs():
-    """
-    Given a playlist id in the request body, 
-    recommends songs based on that playlist.
-    """
-    authenticated, auth_manager = authenticate()
-    if not authenticated:
-        return failure_response('not signed in', 401)
-    sp = SpotifyRecommender(auth_manager=auth_manager)
-
-    playlists = sp.playlists().get('playlists')
-    body = json.loads(request.data)
-    playlist_id = body.get("playlist_id")
-
-    if playlists is None:
-        return failure_response("Error Retrieving playlists", 500)
-    if playlist_id is None:
-        return failure_response("Please Supply Playlist Id", 400)
-    if not (any(item["id"] == playlist_id for item in playlists)):
-        return failure_response("Not a valid playlist", 400)
-
-    # Format Recs Array:
-    rec_res = [sp.track_info(id) for id in sp.recommend_tracks(playlist_id)]
-
-    return success_response({"recs": rec_res})
-
-
-@app.route("/song/")
-def get_song():
-    """
-    Returns Song Info given an id.
-    """
-    authenticated, auth_manager = authenticate()
-    if not authenticated:
-        return failure_response('not signed in', 401)
-    sp = SpotifyRecommender(auth_manager=auth_manager)
-
-    body = json.loads(request.data)
-    track_id = body.get("track_id")
-
-    if track_id is None:
-        return failure_response("Please Supply Song Id", 400)
-
-    track_info = sp.track_info(track_id)
-    if track_info is None:
-        return failure_response('Invalid Track id', 400)
-
-    return track_info
-
-
-@app.route("/user/")
-def get_user_info():
-    """
-    Returns Info of current user.
-    """
-    authenticated, auth_manager = authenticate()
-    if not authenticated:
-        return failure_response('not signed in', 401)
-    sp = SpotifyRecommender(auth_manager=auth_manager)
-
-    return success_response(sp.profile_info())
 
 
 @app.route('/add-track/', methods=['POST'])
@@ -185,6 +127,50 @@ def add_track_to_playlist():
     track = sp.track_info(track_id)
 
     return success_response(track)
+
+
+@app.route('/playlist-info/', methods=["GET", "POST"])
+def get_playlist_info():
+    """
+    Given the id of a playlist, returns the img url and name of it
+    """
+    authenticated, auth_manager = authenticate()
+    if not authenticated:
+        return failure_response('not signed in', 401)
+    sp = SpotifyRecommender(auth_manager=auth_manager)
+
+    body = json.loads(request.data)
+    playlist_id = body.get("playlist_id")
+
+    if playlist_id is None:
+        return failure_response('Missing Playlist id', 401)
+
+    return success_response(sp.playlist_cover(playlist_id))
+
+
+############ TRACK ROUTES ############
+
+@app.route("/song/")
+def get_track():
+    """
+    Returns Song Info given an id.
+    """
+    authenticated, auth_manager = authenticate()
+    if not authenticated:
+        return failure_response('not signed in', 401)
+    sp = SpotifyRecommender(auth_manager=auth_manager)
+
+    body = json.loads(request.data)
+    track_id = body.get("track_id")
+
+    if track_id is None:
+        return failure_response("Please Supply Song Id", 400)
+
+    track_info = sp.track_info(track_id)
+    if track_info is None:
+        return failure_response('Invalid Track id', 400)
+
+    return track_info
 
 
 @app.route('/top-tracks')
@@ -228,23 +214,47 @@ def cover_from_track():
     return success_response(sp.track_cover(track_id))
 
 
-@app.route('/playlist-info/', methods=["GET", "POST"])
-def get_playlist_info():
+############ USER ROUTES ############
+
+@app.route("/user/")
+def get_user_info():
     """
-    Given the id of a playlist, returns the img url and name of it
+    Returns Info of current user.
     """
     authenticated, auth_manager = authenticate()
     if not authenticated:
         return failure_response('not signed in', 401)
     sp = SpotifyRecommender(auth_manager=auth_manager)
 
+    return success_response(sp.profile_info())
+
+
+@app.route('/recommend/', methods=["GET", "POST"])
+def get_recs():
+    """
+    Given a playlist id in the request body, 
+    recommends songs based on that playlist.
+    """
+    authenticated, auth_manager = authenticate()
+    if not authenticated:
+        return failure_response('not signed in', 401)
+    sp = SpotifyRecommender(auth_manager=auth_manager)
+
+    playlists = sp.playlists().get('playlists')
     body = json.loads(request.data)
     playlist_id = body.get("playlist_id")
 
+    if playlists is None:
+        return failure_response("Error Retrieving playlists", 500)
     if playlist_id is None:
-        return failure_response('Missing Playlist id', 401)
+        return failure_response("Please Supply Playlist Id", 400)
+    if not (any(item["id"] == playlist_id for item in playlists)):
+        return failure_response("Not a valid playlist", 400)
 
-    return success_response(sp.playlist_cover(playlist_id))
+    # Format Recs Array:
+    rec_res = [sp.track_info(id) for id in sp.recommend_tracks(playlist_id)]
+
+    return success_response({"recs": rec_res})
 
 
 if __name__ == "__main__":

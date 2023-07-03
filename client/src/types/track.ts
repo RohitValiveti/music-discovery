@@ -8,5 +8,5 @@ export type FullTrack = {
   id: string;
   album: string;
   artists: string[];
-  album_img_url: string
+  album_img_url: string;
 };

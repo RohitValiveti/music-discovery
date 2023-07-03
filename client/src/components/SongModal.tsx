@@ -37,29 +37,30 @@ const SongModal = ({
 
   return (
     <div className="music-panel">
-  <div className="music-panel__content">
-    <div className="music-panel__info">
-      <h3 className="music-panel__title">{name}</h3>
-      <p className="music-panel__album">Album: {album}</p>
-      {artists && (
-        <p className="music-panel__artists">
-          Artist(s):{" "}
-          {artists.map((artist, index) => (
-            <span key={index} className="music-panel__artist">
-              {artist}
-            </span>
-          ))}
-        </p>
-      )}
-      <button className="music-panel__button" onClick={handleClick}>
-        Add Track to your Playlist
-      </button>
-      {added && <div className="music-panel__message">Added to playlist!</div>}
+      <div className="music-panel__content">
+        <div className="music-panel__info">
+          <h3 className="music-panel__title">{name}</h3>
+          <p className="music-panel__album">Album: {album}</p>
+          {artists && (
+            <p className="music-panel__artists">
+              Artist(s):{" "}
+              {artists.map((artist, index) => (
+                <span key={index} className="music-panel__artist">
+                  {artist},
+                </span>
+              ))}
+            </p>
+          )}
+          <button className="music-panel__button" onClick={handleClick}>
+            Add Track to your Playlist
+          </button>
+          {added && (
+            <div className="music-panel__message">Added to playlist!</div>
+          )}
+        </div>
+        <img className="music-panel__image" src={album_img_url} alt="album" />
+      </div>
     </div>
-    <img className="music-panel__image" src={album_img_url} alt="album" />
-  </div>
-</div>
-
   );
 };
 
