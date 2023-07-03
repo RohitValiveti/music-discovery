@@ -11,8 +11,6 @@
   padding-bottom: 5%;
 }
 
-/*Homepage Styles*/
-
 .loader {
   justify-content: center;
   align-items: center;
@@ -33,6 +31,36 @@
   justify-content: center;
   align-items: center;
   padding: 40;
+}
+
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-container {
+  margin-right: 20px;
+}
+
+.welcome-text {
+  padding: 40px;
+}
+
+.about-yourself-text {
+  font-size: 20px;
+}
+
+.follower-playlist-text {
+  font-size: 16px;
+}
+
+.top-tracks-text {
+  font-size: 16px;
+}
+
+.user-image {
+  border: 2px solid #1db954;
 }
 
 /*Song Modal Styles*/

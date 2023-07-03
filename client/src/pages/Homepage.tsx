@@ -33,19 +33,28 @@ const Homepage = () => {
         <div>
           <LastPage endpoint={"/"} pageName="sign in" />
           <div style={{ color: "#535353" }} className="homepage">
-            <Typography variant="h3" style={{ padding: 40 }}>
-              Welcome {userInfo.name}!
-            </Typography>
-            <Typography variant="h5">
-              Here's a little about yourself if you forgot:
-            </Typography>
-            <Typography variant="h6">
-              You have {userInfo.followers} followers and{" "}
-              {userInfo.public_playlists} public playlist(s).
-            </Typography>
-            <Typography variant="h6">
-              And these were your top tracks over the last 4 weeks:
-            </Typography>
+            <div className="centered-container">
+              <div className="text-container">
+                <Typography variant="h3" className="welcome-text">
+                  Welcome {userInfo.name}!
+                </Typography>
+                <Typography variant="h5" className="about-yourself-text">
+                  Here's a little about yourself if you forgot:
+                </Typography>
+                <Typography variant="h6" className="follower-playlist-text">
+                  You have {userInfo.followers} followers and{" "}
+                  {userInfo.public_playlists} public playlist(s).
+                </Typography>
+                <Typography variant="h6" className="top-tracks-text">
+                  And these were your top tracks over the last 4 weeks:
+                </Typography>
+              </div>
+              <img
+                src={userInfo.user_img_url}
+                alt={userInfo.name}
+                className="user-image"
+              />
+            </div>
             <List className="homepage-list">
               {userInfo.top_tracks.map((track, idx) => (
                 <ListItem key={idx}>{track.name}</ListItem>
